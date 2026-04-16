@@ -1,0 +1,142 @@
+.app-shell {
+  min-height: 100vh;
+  background: #0f172a;
+  color: #e2e8f0;
+}
+
+.app-header {
+  border-bottom: 1px solid #1e293b;
+  padding: 16px 24px;
+  text-align: center;
+}
+
+.app-title {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.page-shell {
+  display: flex;
+  justify-content: center;
+  padding: 40px 20px 64px;
+}
+
+.card {
+  width: 100%;
+  max-width: 760px;
+  background: #111827;
+  border: 1px solid #1f2937;
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+}
+
+.page-description {
+  color: #94a3b8;
+  margin-bottom: 24px;
+}
+
+.stack-form,
+.stack-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+label {
+  font-weight: 600;
+}
+
+select,
+input[type='file'],
+.text-area {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid #334155;
+  background: #0f172a;
+  color: #e2e8f0;
+}
+
+.text-area {
+  resize: vertical;
+}
+
+button,
+.primary-button {
+  border: none;
+  border-radius: 10px;
+  padding: 12px 18px;
+  background: #6366f1;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+button:disabled,
+.primary-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.status-message {
+  margin: 0;
+  color: #cbd5e1;
+}
+
+.status-message.error {
+  color: #fca5a5;
+}
+
+.eyebrow {
+  margin: 0;
+  color: #93c5fd;
+  font-weight: 600;
+}
+
+.question-title {
+  margin: 0;
+}
+
+.result-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 20px;
+  border-radius: 12px;
+  background: #0f172a;
+  border: 1px solid #334155;
+}
+
+.score-label {
+  margin: 0;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.8rem;
+}
+
+.score-value {
+  margin: 0;
+  font-size: 2.5rem;
+  font-weight: 800;
+}
+
+.feedback-card {
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid #334155;
+  background: #0f172a;
+}
+
+@media (max-width: 640px) {
+  .card {
+    padding: 24px;
+  }
+
+  .page-shell {
+    padding: 24px 16px 40px;
+  }
+}

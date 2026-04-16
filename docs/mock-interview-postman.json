@@ -1,0 +1,485 @@
+{
+    "info": {
+      "name": "Mock Interview API",
+      "_postman_id": "8e9f3b0b-4a0b-4af7-9e2d-0f4d2e8f2a11",
+      "description": "Basic API checks for Mock Interview backend",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "variable": [
+      {
+        "key": "baseUrl",
+        "value": "http://127.0.0.1:8000"
+      }
+    ],
+    "item": [
+      {
+        "name": "Create Session - Valid",
+        "request": {
+          "method": "POST",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"difficulty\": \"medium\"\n}"
+          },
+          "url": {
+            "raw": "{{baseUrl}}/api/sessions/",
+            "host": [
+              "{{baseUrl}}"
+            ],
+            "path": [
+              "api",
+              "sessions",
+              ""
+            ]
+          },
+          "description": "Should return 201 with id, difficulty, status, created_at"
+        },
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "type": "text/javascript",
+              "exec": [
+                "pm.test('Status code is 201', function () {",
+                "    pm.response.to.have.status(201);",
+                "});",
+                "",
+                "const jsonData = pm.response.json();",
+                "",
+                "pm.test('Response has required fields', function () {",
+                "    pm.expect(jsonData).to.have.property('id');",
+                "    pm.expect(jsonData).to.have.property('difficulty');",
+                "    pm.expect(jsonData).to.have.property('status');",
+                "    pm.expect(jsonData).to.have.property('created_at');",
+                "});",
+                "",
+                "pm.test('difficulty is medium', function () {",
+                "    pm.expect(jsonData.difficulty).to.eql('medium');",
+                "});",
+                "",
+                "pm.test('status is draft', function () {",
+                "    pm.expect(jsonData.status).to.eql('draft');",
+                "});",
+                "",
+                "pm.collectionVariables.set('sessionId', jsonData.id);"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "Create Session - Invalid Difficulty",
+        "request": {
+          "method": "POST",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"difficulty\": \"expert\"\n}"
+          },
+          "url": {
+            "raw": "{{baseUrl}}/api/sessions/",
+            "host": [
+              "{{baseUrl}}"
+            ],
+            "path": [
+              "api",
+              "sessions",
+              ""
+            ]
+          },
+          "description": "Should return 400 validation error"
+        },
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "type": "text/javascript",
+              "exec": [
+                "pm.test('Status code is 400', function () {",
+                "    pm.response.to.have.status(400);",
+                "});"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "Upload Resume",
+        "request": {
+          "method": "POST",
+          "body": {
+            "mode": "formdata",
+            "formdata": [
+              {
+                "key": "file",
+                "type": "file",
+                "src": ""
+              }
+            ]
+          },
+          "url": {
+            "raw": "{{baseUrl}}/api/sessions/{{sessionId}}/resume/",
+            "host": ["{{baseUrl}}"],
+            "path": ["api", "sessions", "{{sessionId}}", "resume", ""]
+          },
+          "description": "Upload resume file (.pdf/.docx) for a session"
+        },
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "type": "text/javascript",
+              "exec": [
+                "pm.test('Status code is 200', function () {",
+                "  pm.response.to.have.status(200);",
+                "});",
+                "const jsonData = pm.response.json();",
+                "pm.test('Response has session_id and resume_id', function () {",
+                "  pm.expect(jsonData).to.have.property('session_id');",
+                "  pm.expect(jsonData).to.have.property('resume_id');",
+                "});"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "Get Session Detail",
+        "request": {
+          "method": "GET",
+          "url": {
+            "raw": "{{baseUrl}}/api/sessions/{{sessionId}}/",
+            "host": ["{{baseUrl}}"],
+            "path": ["api", "sessions", "{{sessionId}}", ""]
+          },
+          "description": "Fetch session details, resume metadata, and ordered question IDs"
+        },
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "type": "text/javascript",
+              "exec": [
+                "pm.test('Status code is 200', function () {",
+                "  pm.response.to.have.status(200);",
+                "});",
+                "",
+                "const jsonData = pm.response.json();",
+                "",
+                "pm.test('Response has session key', function () {",
+                "  pm.expect(jsonData).to.have.property('session');",
+                "});",
+                "",
+                "pm.test('Response has resume key', function () {",
+                "  pm.expect(jsonData).to.have.property('resume');",
+                "});",
+                "",
+                "pm.test('Response has question_ids array', function () {",
+                "  pm.expect(jsonData).to.have.property('question_ids');",
+                "  pm.expect(jsonData.question_ids).to.be.an('array');",
+                "});"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "Generate Questions - Mock",
+        "request": {
+          "method": "POST",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"resume_text\": \"Python Django React\",\n  \"difficulty\": \"medium\",\n  \"num_questions\": 3\n}"
+          },
+          "url": {
+            "raw": "http://127.0.0.1:8001/generate-questions",
+            "protocol": "http",
+            "host": ["127", "0", "0", "1"],
+            "port": "8001",
+            "path": ["generate-questions"]
+          },
+          "description": "Mock question generation endpoint test"
+        },
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "type": "text/javascript",
+              "exec": [
+                "pm.test('Status code is 200', function () {",
+                "  pm.response.to.have.status(200);",
+                "});",
+                "",
+                "const jsonData = pm.response.json();",
+                "pm.test('questions is an array', function () {",
+                "  pm.expect(jsonData).to.have.property('questions');",
+                "  pm.expect(jsonData.questions).to.be.an('array');",
+                "});",
+                "pm.test('questions count is 3', function () {",
+                "  pm.expect(jsonData.questions.length).to.eql(3);",
+                "});"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "method": "POST",
+        "url": "http://127.0.0.1:8001/evaluate-session",
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "difficulty": "medium",
+          "items": [
+            {
+              "question": "Tell me about Python decorators",
+              "answer": "Decorators wrap functions to add behavior like logging."
+            },
+            {
+              "question": "How does Django ORM help?",
+              "answer": "It maps database tables to Python models and simplifies queries."
+            }
+          ]
+        }
+      },
+      {
+        "name": "Evaluate Session",
+        "request": {
+          "method": "POST",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"difficulty\": \"medium\",\n  \"items\": [\n    {\n      \"question\": \"Tell me about Python decorators\",\n      \"answer\": \"Decorators wrap functions to add behavior like logging.\"\n    },\n    {\n      \"question\": \"How does Django ORM help?\",\n      \"answer\": \"It maps database tables to Python models and simplifies queries.\"\n    }\n  ]\n}"
+          },
+          "url": {
+            "raw": "http://127.0.0.1:8001/evaluate-session",
+            "protocol": "http",
+            "host": ["127", "0", "0", "1"],
+            "port": "8001",
+            "path": ["evaluate-session"]
+          },
+          "description": "Evaluate Q&A with Groq and return total_score, overall_feedback, per_question"
+        },
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "type": "text/javascript",
+              "exec": [
+                "pm.test('Status code is 200', function () {",
+                "  pm.response.to.have.status(200);",
+                "});",
+                "",
+                "const jsonData = pm.response.json();",
+                "pm.test('Response has required keys', function () {",
+                "  pm.expect(jsonData).to.have.property('total_score');",
+                "  pm.expect(jsonData).to.have.property('overall_feedback');",
+                "  pm.expect(jsonData).to.have.property('per_question');",
+                "});",
+                "pm.test('per_question is array', function () {",
+                "  pm.expect(jsonData.per_question).to.be.an('array');",
+                "});"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "Submit Answer",
+        "request": {
+          "method": "POST",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"question_id\": \"{{questionId}}\",\n  \"answer\": \"My detailed answer here.\"\n}"
+          },
+          "url": {
+            "raw": "{{baseUrl}}/api/sessions/{{sessionId}}/answers/",
+            "host": ["{{baseUrl}}"],
+            "path": ["api", "sessions", "{{sessionId}}", "answers", ""]
+          },
+          "description": "Submit answer for one question (question must belong to session)"
+        },
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "type": "text/javascript",
+              "exec": [
+                "pm.test('Status code is 200', function () {",
+                "  pm.response.to.have.status(200);",
+                "});",
+                "",
+                "const jsonData = pm.response.json();",
+                "pm.test('Response has answer fields', function () {",
+                "  pm.expect(jsonData).to.have.property('id');",
+                "  pm.expect(jsonData).to.have.property('question');",
+                "  pm.expect(jsonData).to.have.property('text');",
+                "  pm.expect(jsonData).to.have.property('created_at');",
+                "});"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "Generate Questions - Django",
+        "request": {
+          "method": "POST",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"num_questions\": 3\n}"
+          },
+          "url": {
+            "raw": "{{baseUrl}}/api/sessions/{{sessionId}}/questions/generate/",
+            "host": ["{{baseUrl}}"],
+            "path": ["api", "sessions", "{{sessionId}}", "questions", "generate", ""]
+          },
+          "description": "Generate and persist interview questions for a session"
+        },
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "type": "text/javascript",
+              "exec": [
+                "pm.test('Status code is 200', function () {",
+                "  pm.response.to.have.status(200);",
+                "});",
+                "",
+                "const jsonData = pm.response.json();",
+                "pm.test('Response has questions array', function () {",
+                "  pm.expect(jsonData).to.have.property('questions');",
+                "  pm.expect(jsonData.questions).to.be.an('array');",
+                "  pm.expect(jsonData.questions.length).to.be.above(0);",
+                "});",
+                "",
+                "if (jsonData.questions && jsonData.questions[0] && jsonData.questions[0].id) {",
+                "  pm.collectionVariables.set('questionId', jsonData.questions[0].id);",
+                "}"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "Complete Session",
+        "request": {
+          "method": "POST",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "{}"
+          },
+          "url": {
+            "raw": "{{baseUrl}}/api/sessions/{{sessionId}}/complete/",
+            "host": ["{{baseUrl}}"],
+            "path": ["api", "sessions", "{{sessionId}}", "complete", ""]
+          },
+          "description": "Finalize interview session, run AI evaluation, save score and feedback"
+        },
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "type": "text/javascript",
+              "exec": [
+                "pm.test('Status code is 200', function () {",
+                "  pm.response.to.have.status(200);",
+                "});",
+                "",
+                "const jsonData = pm.response.json();",
+                "pm.test('Response has completion fields', function () {",
+                "  pm.expect(jsonData).to.have.property('session_id');",
+                "  pm.expect(jsonData).to.have.property('status');",
+                "  pm.expect(jsonData).to.have.property('evaluation_id');",
+                "  pm.expect(jsonData).to.have.property('total_score');",
+                "  pm.expect(jsonData).to.have.property('feedback');",
+                "});",
+                "",
+                "pm.test('Status is completed', function () {",
+                "  pm.expect(jsonData.status).to.eql('completed');",
+                "});"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "Get Session Result",
+        "request": {
+          "method": "GET",
+          "url": {
+            "raw": "{{baseUrl}}/api/sessions/{{sessionId}}/result/",
+            "host": ["{{baseUrl}}"],
+            "path": ["api", "sessions", "{{sessionId}}", "result", ""]
+          },
+          "description": "Fetch completed session evaluation result"
+        },
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "type": "text/javascript",
+              "exec": [
+                "pm.test('Status code is 200', function () {",
+                "  pm.response.to.have.status(200);",
+                "});",
+                "",
+                "const jsonData = pm.response.json();",
+                "pm.test('Response has result fields', function () {",
+                "  pm.expect(jsonData).to.have.property('session_id');",
+                "  pm.expect(jsonData).to.have.property('status');",
+                "  pm.expect(jsonData).to.have.property('evaluation_id');",
+                "  pm.expect(jsonData).to.have.property('total_score');",
+                "  pm.expect(jsonData).to.have.property('feedback');",
+                "});",
+                "",
+                "pm.test('Status is completed', function () {",
+                "  pm.expect(jsonData.status).to.eql('completed');",
+                "});"
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  }
